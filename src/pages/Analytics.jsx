@@ -63,25 +63,36 @@ export default function Analytics() {
   };
 
   return (
-    <div className="p-8 min-h-screen bg-gradient-to-br from-gray-100 to-gray-200">
-      <h1 className="text-4xl font-extrabold text-gray-800 mb-10">
+    <div className="p-4 sm:p-6 xl:p-10">
+      {/* Header */}
+      <h1 className="text-xl sm:text-2xl xl:text-3xl font-extrabold text-gray-900 mb-8">
         Analytics Dashboard
       </h1>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
-        <StatCard title="Total Tickets" value={stats.total} color="blue" />
-        <StatCard title="Open Tickets" value={stats.open} color="green" />
-        <StatCard title="Closed Tickets" value={stats.closed} color="red" />
-        <StatCard title="In Progress" value={stats.progress} color="yellow" />
-        <StatCard title="Avg Response Time" value={`${stats.avgResponse} min`} color="purple" />
-        <StatCard title="Satisfaction" value={`${stats.satisfaction}%`} color="pink" />
+      <div className="
+        grid 
+        grid-cols-2 
+        sm:grid-cols-3 
+        lg:grid-cols-4 
+        xl:grid-cols-6 
+        gap-4 
+        mb-8
+      ">
+        <StatCard title="Total Tickets" value={stats.total} />
+        <StatCard title="Open Tickets" value={stats.open} />
+        <StatCard title="Closed Tickets" value={stats.closed} />
+        <StatCard title="In Progress" value={stats.progress} />
+        <StatCard title="Avg Response" value={`${stats.avgResponse} min`} />
+        <StatCard title="Satisfaction" value={`${stats.satisfaction}%`} />
       </div>
 
       {/* Chart Section */}
-      <div className="bg-white/90 backdrop-blur-xl rounded-3xl shadow-xl p-8 border border-gray-300 mb-12">
-        <h2 className="text-2xl font-semibold text-gray-800 mb-6">Tickets Per Day</h2>
-        <div className="h-72">
+      <div className="bg-white rounded-3xl shadow-lg p-6 border border-gray-200 mb-10 hover:shadow-2xl transition">
+        <h2 className="text-xl sm:text-2xl font-semibold text-gray-900 mb-6">
+          Tickets Per Day
+        </h2>
+        <div className="h-64 sm:h-72">
           <Bar
             data={{
               labels: chartData.labels,
@@ -89,8 +100,8 @@ export default function Analytics() {
                 {
                   label: "Tickets",
                   data: chartData.counts,
-                  backgroundColor: "rgba(79, 70, 229, 0.8)",
-                  borderRadius: 12,
+                  backgroundColor: "#2563EB", // Nice deep blue
+                  borderRadius: 10,
                 },
               ],
             }}
@@ -98,82 +109,89 @@ export default function Analytics() {
               plugins: { legend: { display: false } },
               responsive: true,
               maintainAspectRatio: false,
+              scales: {
+                x: { ticks: { color: "#000" }, grid: { color: "#e5e5e5" } },
+                y: { ticks: { color: "#000" }, grid: { color: "#e5e5e5" } },
+              },
             }}
           />
         </div>
       </div>
 
-      {/* Table */}
-      <div className="bg-white/90 backdrop-blur-xl rounded-3xl shadow-xl p-8 border border-gray-300">
-        <h2 className="text-2xl font-semibold text-gray-800 mb-6">Ticket Details</h2>
+      {/* Table Section */}
+      <div className="overflow-x-auto bg-white rounded-3xl shadow-lg border border-gray-200 p-6 transition">
+        <h2 className="text-xl sm:text-2xl font-semibold text-gray-900 mb-6">
+          Ticket Details
+        </h2>
 
-        <div className="overflow-hidden border border-gray-200 rounded-2xl">
-          <table className="min-w-full text-left">
-            <thead className="bg-gray-100 text-gray-700">
-              <tr>
-                <th className="px-6 py-4 text-sm font-medium">User</th>
-                <th className="px-6 py-4 text-sm font-medium">Category</th>
-                <th className="px-6 py-4 text-sm font-medium">Priority</th>
-                <th className="px-6 py-4 text-sm font-medium">Status</th>
-                <th className="px-6 py-4 text-sm font-medium">Created</th>
-              </tr>
-            </thead>
+        <table className="min-w-full text-left divide-y divide-gray-200">
+          <thead className="bg-gray-50">
+            <tr>
+              {["User", "Category", "Priority", "Status", "Created At"].map(
+                (head) => (
+                  <th
+                    key={head}
+                    className="px-6 py-3 text-xs sm:text-sm font-semibold text-gray-700 uppercase tracking-wider"
+                  >
+                    {head}
+                  </th>
+                )
+              )}
+            </tr>
+          </thead>
 
-            <tbody className="divide-y divide-gray-200 bg-white">
-              {tickets.map((t) => (
-                <tr
-                  key={t.id}
-                  className="hover:bg-gray-50 transition cursor-pointer"
-                >
-                  <td className="px-6 py-4 text-gray-800">{t.username || t.userId}</td>
-                  <td className="px-6 py-4 text-gray-800">{t.category || "General"}</td>
-                  <td className="px-6 py-4 capitalize">{t.priority}</td>
+          <tbody className="bg-white divide-y divide-gray-200">
+            {tickets.map((t, index) => (
+              <tr
+                key={t.id}
+                className={`transition hover:bg-gray-50 ${
+                  index % 2 === 0 ? "bg-gray-50/50" : "bg-white"
+                }`}
+              >
+                <td className="px-6 py-3 text-gray-800">
+                  {t.username || t.userId}
+                </td>
+                <td className="px-6 py-3 text-gray-800">
+                  {t.category || "General"}
+                </td>
+                <td className="px-6 py-3 capitalize">{t.priority}</td>
 
-                  <td
-                    className={`px-6 py-4 font-semibold ${
+                <td className="px-6 py-3">
+                  <span
+                    className={`px-3 py-1 rounded-full text-sm font-medium ${
                       t.status === "open"
-                        ? "text-green-600"
+                        ? "bg-green-100 text-green-800"
                         : t.status === "closed"
-                        ? "text-red-600"
-                        : "text-blue-600"
+                        ? "bg-red-100 text-red-800"
+                        : "bg-yellow-100 text-yellow-800"
                     }`}
                   >
                     {t.status}
-                  </td>
+                  </span>
+                </td>
 
-                  <td className="px-6 py-4 text-gray-500">
-                    {t.createdAt
-                      ? new Date(t.createdAt.seconds * 1000).toLocaleString()
-                      : "-"}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+                <td className="px-6 py-3 text-gray-500">
+                  {t.createdAt
+                    ? new Date(t.createdAt.seconds * 1000).toLocaleString()
+                    : "-"}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
     </div>
   );
 }
 
-function StatCard({ title, value, color }) {
-  const colorMap = {
-    blue: "from-blue-500 to-blue-600",
-    green: "from-green-500 to-green-600",
-    red: "from-red-500 to-red-600",
-    yellow: "from-yellow-500 to-yellow-600",
-    purple: "from-purple-500 to-purple-600",
-    pink: "from-pink-500 to-pink-600",
-  };
-
+// Stat Card Component
+function StatCard({ title, value }) {
   return (
-    <div className="rounded-3xl shadow-lg p-6 bg-white/80 backdrop-blur-xl border border-gray-200 hover:shadow-xl transition">
-      <p className="text-sm text-gray-500 mb-2">{title}</p>
-      <h2
-        className={`text-3xl font-extrabold bg-gradient-to-r ${colorMap[color]} bg-clip-text text-transparent`}
-      >
-        {value}
-      </h2>
+    <div className="rounded-3xl shadow-sm p-5 border border-gray-200 bg-white hover:shadow-xl transition">
+      <p className="text-xs sm:text-sm font-medium text-gray-500 mb-1">
+        {title}
+      </p>
+      <h2 className="text-xl sm:text-2xl font-bold text-black">{value}</h2>
     </div>
   );
 }
