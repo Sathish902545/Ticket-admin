@@ -7,55 +7,67 @@ import { useNavigate } from "react-router-dom";
 export default function Login() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
 
     const handleLogin = async () => {
-        try {
-            const res = await signInWithEmailAndPassword(auth, email, password);
+        if (!email || !password) {
+            alert("Please fill all fields");
+            return;
+        }
 
+        try {
+            setLoading(true);
+
+            const res = await signInWithEmailAndPassword(auth, email, password);
             const uid = res.user.uid;
+
             const snap = await getDoc(doc(db, "users", uid));
             const data = snap.data();
 
-             if (data?.role === "admin") {
-  navigate(`/admin`);
-} else {
-  navigate(`/notAuthorized`);
-}
+            if (data?.role === "admin") {
+                navigate("/admin");
+            } else {
+                navigate("/notAuthorized");
+            }
 
-    } catch (e) {
-            alert(e.message);
+        } catch (error) {
+            alert(error.message);
+        } finally {
+            setLoading(false);
         }
     };
 
     return (
-        <div className="min-h-screen flex justify-center items-center bg-gray-100">
-            <div className="bg-white p-8 rounded-2xl shadow-lg w-full max-w-md border border-gray-200">
+        <div className="min-h-screen flex justify-center items-center bg-gray-100 px-4">
+            <div className="bg-white p-8 rounded-3xl shadow-xl w-full max-w-md border border-gray-200">
 
-                {/* Logo or Title */}
-                <h1 className="text-3xl font-bold text-secondary mb-2 text-center">
+                {/* Title */}
+                <h1 className="text-3xl font-semibold text-gray-900 mb-2 text-center">
                     Welcome Back
                 </h1>
                 <p className="text-gray-500 text-center mb-8">
-                    Login to continue your account
+                    Login to continue your dashboard
                 </p>
 
                 {/* Email */}
-                <label className="text-gray-800 font-medium mb-1">Email</label>
+                <label className="text-gray-800 font-medium text-sm mb-1">Email</label>
                 <input
                     type="email"
-                    className="w-full mb-4 px-4 py-3 border rounded-xl border-gray-300 
-                       focus:ring-2 focus:outline-none transition"
+                    className="w-full mb-5 px-4 py-3 border rounded-xl border-gray-300 
+                       focus:ring-2 focus:ring-blue-500 focus:border-blue-500
+                       outline-none transition"
                     placeholder="Enter your email"
                     onChange={(e) => setEmail(e.target.value)}
                 />
 
                 {/* Password */}
-                <label className="text-gray-800 font-medium mb-1">Password</label>
+                <label className="text-gray-800 font-medium text-sm mb-1">Password</label>
                 <input
                     type="password"
                     className="w-full mb-6 px-4 py-3 border rounded-xl border-gray-300 
-                       focus:ring-2 focus:outline-none transition"
+                       focus:ring-2 focus:ring-blue-500 focus:border-blue-500
+                       outline-none transition"
                     placeholder="Enter your password"
                     onChange={(e) => setPassword(e.target.value)}
                 />
@@ -63,18 +75,20 @@ export default function Login() {
                 {/* Button */}
                 <button
                     onClick={handleLogin}
-                    className="w-full py-3 bg-secondary text-white font-semibold
-                       rounded-xl transition transform active:scale-95"
+                    disabled={loading}
+                    className={`w-full py-3 bg-blue-600 text-white font-semibold
+                       rounded-xl transition transform active:scale-95
+                       ${loading ? "opacity-70 cursor-not-allowed" : "hover:bg-blue-700"}`}
                 >
-                    Login
+                    {loading ? "Logging in..." : "Login"}
                 </button>
 
-                {/* Bottom text */}
+                {/* Register */}
                 <p className="text-sm text-gray-600 mt-6 text-center">
                     Don’t have an account?
                     <span
                         onClick={() => navigate("/signup")}
-                        className="text-secondary font-medium cursor-pointer hover:underline ml-1"
+                        className="text-blue-600 font-medium cursor-pointer hover:underline ml-1"
                     >
                         Create account
                     </span>
